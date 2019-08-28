@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<style type="text/css">
+	html,body{
+		margin: 0px;
+		position: fixed;
+		overflow: hidden;
+		width: 100%;
+		height: 100%;
+	}
+	.color-box {		
+		position: fixed;
+		top: 0;
+		right: 0;
+		z-index: 1;
+	}
+	button {
+		display: inline-block;
+		width: 15px;
+		height: 15px;
+		border-radius: 50%;
+	}
+</style>
+</head>
+<body>
+<canvas id="myCanvas">
+</canvas>
+<div class="color-box">
+	<button style="background-color: #000;"></button>
+	<button style="background-color: #880015;"></button>
+	<button style="background-color: #ED1C24;"></button>
+	<button style="background-color: #FF7F27;"></button>
+	<button style="background-color: #FFF200;"></button>
+	<button style="background-color: #22B14C;"></button>
+	<button style="background-color: #00A2E8;"></button>
+	<button style="background-color: #3F48CC;"></button>
+	<button style="background-color: #A349A4;"></button>
+</div>
+</body>
+<script type="text/javascript">
+$(function () {
+	var color = "#000";
+	function Draw(canvas){
+		var _ = this;
+		_.$w = $(window);
+		_.c = document.getElementById("myCanvas");
+		_.ctx = _.c.getContext("2d");
+		_.ww = _.$w.innerWidth();
+		_.wh = _.$w.height();
+		//設定畫布版寬
+		_.c.width = _.ww;
+		_.c.height = _.wh;
+		//前一動位置
+		_.prevX = 0;
+		_.prevY = 0;
+		_.mousedown_flag = 0; //滑鼠是否按左建
+		canvas.on("mousedown",function(e){
+			_.mousedown_flag = 1;
+			_.prevX=e.pageX;
+			_.prevY=e.pageY;
+			_.start(_.prevX,_.prevY);
+			_.ctx.beginPath();
+			_.ctx.moveTo(_.prevX,_.prevY);
+			canvas.one("mouseup",function(e){
+				_.mousedown_flag = 0;
+			});
+		});
+		canvas.on("mousemove",function(e){
+			if(_.mousedown_flag==1) {
+				_.pathto(e.pageX,e.pageY);
+			}
+		});
+		canvas.on("touchstart",function(e){
+			var touch = e.originalEvent.targetTouches[0];
+			_.start(touch.clientX,touch.clientY);
+			_.ctx.beginPath();
+			_.ctx.moveTo(touch.clientX,touch.clientY);
+			_.pathto(touch.clientX,touch.clientY);
+		});
+		canvas.on("touchmove",function(e){
+			var touch = e.originalEvent.targetTouches[0];
+			_.pathto(touch.clientX,touch.clientY);
+		});
+		canvas.on("touchend",function(e){
+		});
+	}
+	Draw.prototype.pathto = function(eX,eY){
+		var _ = this;
+		_.ctx.lineTo(eX,eY);
+		_.ctx.strokeStyle=color;
+		_.ctx.lineWidth = 2;
+		_.ctx.stroke();
+	}
+	Draw.prototype.start= function(eX,eY) {
+		var _ = this;
+		_.ctx.fillStyle = color;
+		_.ctx.fillRect(eX,eY,2,2);
+	}
+	new Draw($("#myCanvas"));
+	$(".color-box button").on("click",function(){
+		color = $(this).css("background-color");
+	});
+});
+</script>
+</html>
